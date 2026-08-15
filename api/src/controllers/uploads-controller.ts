@@ -17,14 +17,14 @@ class UploadsController {
             .string()
             .refine(
               (type) => uploadConfig.ACCEPTED_IMAGE_TYPES.includes(type),
-              "Formato de arquivo inválido. Apenas JPEG, PNG e PDF são permitidos."
+              "Formato de arquivo inválido. Apenas JPEG e PNG são permitidos."
             ),
           size: z
             .number()
             .positive()
             .refine(
               (size) => size <= uploadConfig.MAX_FILE_SIZE,
-              "Arquivo excede o tamanho máximo de 5MB."
+              "Arquivo excede o tamanho máximo de 1MB."
             ),
         })
         .passthrough() // Permite propriedades adicionais que o multer adiciona ao arquivo

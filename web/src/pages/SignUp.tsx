@@ -10,22 +10,34 @@ import { useNavigate } from "react-router";
 
 const signUpSchema = z
   .object({
-    name: z.string(),
-    email: z.email({ error: "E=mail inválido" }),
-    password: z.string(),
+    name: z.string().trim().min(2, { message: "Informe seu nome" }),
+    email: z.email({ error: "E-mail inválido" }),
+    password: z
+      .string()
+      .min(6, { message: "A senha deve ter pelo menos 6 caracteres" }),
     passwordConfirm: z.string(),
   })
   .refine((data) => data.password === data.passwordConfirm, {
-    message: "Os senhas não são iguais",
+    message: "As senhas não são iguais",
     path: ["passwordConfirm"],
   });
 
+type SignUpState = {
+  message?: string;
+};
+
 export function SignUp() {
-  const [state, formAction, isLoading] = useActionState(onSignup, null);
+  const [state, formAction, isLoading] = useActionState<SignUpState, FormData>(
+    onSignUp,
+    {},
+  );
 
   const navigate = useNavigate();
 
-  async function onSignup(_: any, formData: FormData) {
+  async function onSignUp(
+    _previousState: SignUpState,
+    formData: FormData,
+  ): Promise<SignUpState> {
     const name = formData.get("name");
     const email = formData.get("email");
     const password = formData.get("password");
@@ -40,21 +52,19 @@ export function SignUp() {
       });
 
       await api.post("/users", data);
-
-      return confirm(
-        "Usuário cadastrado com sucesso, deseja ir para tela de login?",
-      )
-        ? navigate("/")
-        : null;
+      navigate("/");
+      return {};
     } catch (error) {
       if (error instanceof ZodError) {
-        return alert(error.issues[0].message);
+        return { message: error.issues[0].message };
       }
 
       if (error instanceof AxiosError) {
-        return alert(error.response?.data.message);
+        const data = error.response?.data as { message?: string } | undefined;
+        return { message: data?.message ?? "Não foi possível criar a conta" };
       }
-    } finally {
+
+      return { message: "Não foi possível criar a conta" };
     }
   }
 
@@ -63,7 +73,6 @@ export function SignUp() {
       <Input
         required
         name="name"
-        defaultValue={state?.name}
         placeholder="Seu nome"
         legend="Nome"
       />
@@ -71,7 +80,6 @@ export function SignUp() {
       <Input
         required
         name="email"
-        defaultValue={state?.email}
         placeholder="seu@email.com"
         legend="E-mail"
         type="email"
@@ -80,7 +88,6 @@ export function SignUp() {
       <Input
         required
         name="password"
-        defaultValue={state?.password}
         placeholder="******"
         legend="Senha"
         type="password"
@@ -89,7 +96,6 @@ export function SignUp() {
       <Input
         required
         name="passwordConfirm"
-        defaultValue={state?.passwordConfirm}
         placeholder="******"
         legend="Confirme a senha"
         type="password"
@@ -98,6 +104,8 @@ export function SignUp() {
       <Button type="submit" isLoading={isLoading}>
         Cadastrar
       </Button>
+
+      <p className="text-red-700 text-center">{state.message}</p>
 
       <a
         href="/"

@@ -1,4 +1,5 @@
 import { createContext, useEffect, useState } from "react";
+import type { PropsWithChildren } from "react";
 import { api } from "../services/api";
 
 type AuthContext = {
@@ -12,7 +13,7 @@ export const AuthContext = createContext({} as AuthContext);
 
 const LOCAL_STORAGE_KEY = "@refund";
 
-export function AuthProvider({ children }) {
+export function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<null | UserAPIResponse>(null);
   const [isLoading, setIsLoading] = useState(true);
 
