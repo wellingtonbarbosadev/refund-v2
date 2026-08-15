@@ -1,7 +1,8 @@
 {
-  "name": "web",
+  "name": "refund-web",
   "private": true,
   "version": "0.0.0",
+  "description": "Interface React para envio e gestão de solicitações de reembolso",
   "type": "module",
   "scripts": {
     "dev": "vite",

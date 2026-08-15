@@ -67,7 +67,8 @@ export function Refund() {
         return setMessage(error.issues[0].message);
       }
       if (error instanceof AxiosError) {
-        return setMessage(error.response.data?.message);
+        const data = error.response?.data as { message?: string } | undefined;
+        return setMessage(data?.message ?? "Não foi possível enviar a solicitação");
       }
 
       return setMessage("Ocorreu algum erro");
@@ -94,11 +95,11 @@ export function Refund() {
     }
   }
 
-  if (params.id) {
-    useEffect(() => {
-      onLoadPageWithParam();
-    }, []);
-  }
+  useEffect(() => {
+    if (params.id) {
+      void onLoadPageWithParam();
+    }
+  }, [params.id]);
 
   return (
     <form onSubmit={onSubmit} className="w-full h-full">

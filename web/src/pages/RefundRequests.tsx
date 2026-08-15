@@ -22,14 +22,14 @@ export function RefundRequests() {
   const [perPage] = useState(10);
   const [refunds, setRefunds] = useState<null | RefundAPIResponse[]>(null);
 
-  async function onSubmit(e: React.SubmitEvent, handleLoadPage?: () => void) {
+  async function onSubmit(e: React.SubmitEvent) {
     e.preventDefault();
     setCurrent(1);
-    handleLoadPage();
+    await onLoadPage(1);
   }
 
-  async function onLoadPage() {
-    let queryParams = [`page=${current}`, `perPage=${perPage}`];
+  async function onLoadPage(page = current) {
+    const queryParams = [`page=${page}`, `perPage=${perPage}`];
 
     if (search) queryParams.push(`name=${search}`);
 
@@ -65,9 +65,7 @@ export function RefundRequests() {
     <section className="flex gap-6 flex-col w-full">
       <h1 className="text-xl font-bold ">Solicitações</h1>
       <form
-        onSubmit={(e) => {
-          onSubmit(e, () => onLoadPage());
-        }}
+        onSubmit={onSubmit}
         className="flex gap-3"
       >
         <label className="flex-1">

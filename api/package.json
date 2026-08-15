@@ -1,15 +1,19 @@
 {
-  "name": "refund",
+  "name": "refund-api",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
+    "typecheck": "tsc --noEmit",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate deploy",
+    "seed:demo": "tsx src/database/seed-demo.ts",
     "seed:pagination": "tsx src/database/seed-pagination.ts"
   },
   "keywords": [],
-  "author": "",
+  "author": "Wellington Barbosa",
   "license": "ISC",
-  "description": "",
+  "description": "API de solicitações de reembolso com autenticação e controle de acesso por perfil",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/cors": "^2.8.17",
@@ -23,8 +27,9 @@
   },
   "dependencies": {
     "@prisma/client": "^6.2.1",
-    "bcrypt": "^5.1.1",
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
     "express": "^4.19.2",
     "express-async-errors": "^3.1.1",
     "jsonwebtoken": "^9.0.2",

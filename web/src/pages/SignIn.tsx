@@ -11,12 +11,22 @@ const signInSchema = z.object({
   password: z.string(),
 });
 
+type SignInState = {
+  message?: string;
+};
+
 export function SignIn() {
   const auth = useAuth();
 
-  const [state, formAction, isLoading] = useActionState(onSignup, null);
+  const [state, formAction, isLoading] = useActionState<SignInState, FormData>(
+    onSignIn,
+    {},
+  );
 
-  async function onSignup(_: any, formData: FormData) {
+  async function onSignIn(
+    _previousState: SignInState,
+    formData: FormData,
+  ): Promise<SignInState> {
     const email = formData.get("email");
     const password = formData.get("password");
 
@@ -29,17 +39,18 @@ export function SignIn() {
       const response = await api.post("/sessions", data);
 
       auth.save(response.data);
+      return {};
     } catch (error) {
-
       if (error instanceof ZodError) {
         return { message: error.issues[0].message };
       }
 
       if (error instanceof AxiosError) {
-        return { message: error.response.data.message };
+        const data = error.response?.data as { message?: string } | undefined;
+        return { message: data?.message ?? "Não foi possível entrar" };
       }
 
-      return { message: "Não foi possivel entrar" };
+      return { message: "Não foi possível entrar" };
     }
   }
 
@@ -51,7 +62,6 @@ export function SignIn() {
         placeholder="seu@email.com"
         legend="E-mail"
         type="email"
-        defaultValue={state?.email}
       />
 
       <Input
@@ -60,7 +70,6 @@ export function SignIn() {
         placeholder="******"
         legend="Senha"
         type="password"
-        defaultValue={state?.password}
       />
 
       <p className="text-red-700 text-center">{state?.message}</p>
